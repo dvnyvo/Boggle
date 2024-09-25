@@ -1,0 +1,80 @@
+search: board for: words	
+	"501119407 Danny Vo
+	PSUEDO CODE: 
+	for search: board for: words
+	1.0 - make a trie containing all legal words
+			todo: iterate over each word and letter of word
+					check if the letter(key) has a value
+					if not add an empty dictionary as its value and update curr_trie location to the value of letter 
+						e.g for word 'meow'
+						for letter in word:
+							trie = Dictionary new. -> { : }
+							curr_trie = trie
+							does key 'm' have a value in curr_trie? if no then:
+								add 'm' as KEY
+								add { : } as VALUE
+								update curr_trie = {'m' : { : }}
+							
+							does key 'e' have a value in curr_trie? if no then:
+								add 'e' as KEY
+								add { : } as VALUE
+								update curr_trie = {'m' : {'e' : { : }}} and so on.. until {'m':{'e':{'o':{'w':{:}}}}}
+						by now, the for loop finishes so we can add one last KEY:VALUE which is 'end' marking the end of word
+						curr_trie = {{'m':{'e':{'o':{'w':{'end': meow}}}}}
+						
+		 1.1 - Loop through and call DFS on each cell, it will iterate through each letter, and check potential paths
+					for each letter recursively and whenever a path matches a word in the TRIE (if 'end' key exists -- meaning 					there is key and value in nextTrie/dict), add it's respective path to resultDict!!
+				After loop return resultDict
+			
+			
+			
+	for dfs:
+	 2.0 - a helper function that does DFS search on a cell
+			todo: 
+				given coordinates of cell, trie, visitedpath, board, and result
+			2.1 - Check for the following:
+					1. coordinates not within range of board
+					2. if letter is in trie 
+					3. if coordinates is already visited in visitedpath
+					
+			2.2 -	otherwise do the following in order:
+					1.add letter coordinates to visitedpaths
+					2.check if the next_trie (so next value which contains a dictionary)
+						if there is a value associated with key 'end', if not return false
+						else: we found end of word and can add visitedpath (containing coords) to result
+					3.iterate over adjacent cells recursively calling DFS with next_trie
+					4.remove current location from visitedpaths 
+						-explanation for removing: so basically when your iteratinng on cell(2 @ 2) you run DPS on adjacent cells
+						using a nested loop, so lets say it runs DPS on cell (3@3) for this iteration, it adds (3@3) to the paths
+						and continues extending until it meets a base case which by then could have added a word to result
+						dictionary. THEN it removes its current location from visited paths so it can effectively start back
+						at(2@2) and try the next respective cell with no interference from previous paths (aka visitedpaths)"				
+   | trie resultDict |
+	"1.0 TRIE CREATION"
+	trie := Dictionary new.
+	resultDict := Dictionary new.
+	
+	words do: [ :word | 
+		|currDict|
+		currDict := trie.
+		word do: [ :letter | 
+			currDict := currDict at: letter ifAbsentPut: [Dictionary new]
+			].
+		currDict at: 'end' put: word.
+		].
+   
+
+   "1.1 RUN DFS ON EACH CELL"
+    1 to: board size do: [ :row |
+        1 to: board first size do: [ :col |
+        		self
+                dfs: board 
+					trie: trie 
+					row: row 
+					col: col 
+					visitedPath: OrderedCollection new 
+					resultDict: resultDict
+        ].
+    ].
+
+    ^resultDict

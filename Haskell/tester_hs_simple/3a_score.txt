@@ -1,0 +1,1 @@
+3a: Score = 134 in 533 ms
